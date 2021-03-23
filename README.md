@@ -28,7 +28,11 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 """
 
----
+Start the server with:
+
+    $ npm run server
+
+***
 
 In `package.json' copy this code in the script key:
 
@@ -41,7 +45,7 @@ In `package.json' copy this code in the script key:
 
 Now we can start the server in multiple different ways.
 
----
+***
 
 Create a folder in the root called `config'. The installed package called `config' will use this directory to declare globally accessible configurations. It provides a nice way for us to abstract configuration away from the main code.
 
@@ -61,15 +65,81 @@ const config = require('config');
 const db = config.get('mongoURI');
 
 const connectDB = async () => {
-try {
-    await mongoose.connect(db);
-    console.log('MongoDB connected...');
-} catch(err) {
-    console.error(err.message);
-    // exit process with failure
-    process.exit(1);
+    try {
+        await mongoose.connect(
+            db, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            }
+        );
+        console.log('MongoDB connected...');
+    } catch(err) {
+        console.error(err.message);
+        // exit process with failure
+        process.exit(1);
     }
 }
 
 module.exports = connectDB;
 """
+
+#### 5. Create routes for our server
+
+For each of the routes, we want to break them up inot separate resources and have a specific JS file for each route. Within the root folder, create a directory called `routes/api' and within this folder create files for the different routes: `auth.js', `posts.js', `profile.js' and `users.js'.
+
+These will be the routes that provide our server with different routes.
+
+For each of the route files, use the template below to fill them with this code:
+
+"""
+const express = require('express');
+const router = express.Router();
+
+// @route   GET api/users
+// @desc    Test route
+// @access  Public
+router.get('/', (req, res) => res.send('User route'));
+
+module.exports = router;
+"""
+
+#### 6. Create models for each of our resources
+
+Create a folder in root called `models' and create a JS file to define the schema for each of the collections to be used within our MongoDB database.
+
+Use the below code as a template:
+
+"""
+const mongoose = require('mongoose');
+
+const UserSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    avatar: {
+        type: String,
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+module.exports = User = mongoose.model('user', UserSchema);
+"""
+
+
+
+
+
+
