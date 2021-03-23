@@ -178,3 +178,97 @@ router.post('/', [
 module.exports = router;
 ```
 
+#### 8. Connect API routes to MongoDB database for CRUD
+
+Since our route is async/await, we can now implement our API code using await calls. The code below is for user registration and implements checks to see if the user already exists, collection of the gravatar, password hashing and saving of the user instance.
+
+```
+const express = require('express');
+const router = express.Router();
+const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs');
+const { check, validationResult } = require('express-validator');
+const normalize = require('normalize-url');
+
+// models
+const User = require('../../models/User');
+
+// @route   POST api/users
+// @desc    Register user
+// @access  Public
+router.post('/', [
+    check(
+        'name', 
+        'Name is required'
+    ).not().isEmpty(),
+    check(
+        'email', 
+        'Please include a valid email'
+    ).isEmail(),
+    check(
+        'password', 
+        'Please enter a password with 6 or more characters'
+    ).isLength({ min: 6 })
+    ], 
+    async (req, res) => {
+
+        // check for errors
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
+        const { name, email, password } = req.body;
+
+        try {
+
+            // see if user exists
+            let user = await User.findOne({email: email});
+
+            if (user) {
+                return res.status(400).json({ errors: [{msg: "User already exists"}] })
+            }
+
+            // get users gravatar
+            const avatar = normalize(
+                gravatar.url(email, {
+                    s: '200', // size
+                    r: 'pg', // rating = pg
+                    d: 'mm' // always return a default img
+                }),
+                { forceHttps: true }
+            );
+
+            // create new instance of user
+            user = new User({
+                name, 
+                email,
+                avatar,
+                password
+            })
+
+            // encrypt password
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+            await user.save();
+
+            // return json web token (JWT)
+
+            res.send('User registered')
+
+        } catch(err) {
+            console.error(err.message);
+            res.status(500).send('Server error');
+        }
+    }
+);
+
+module.exports = router;
+```
+
+Anything that returns a promise you want to make sure you put an await in front of, when using the async/await technique. If not using async/await, you use .then() and chain all your asynchronous code together. async/await is much more elegant.
+
+#### 9. Implementing JSON Web Tokens
+
+
+
