@@ -16,7 +16,7 @@
 
 Create a file called `server.js' and paste the following code into it:
 
-"""
+```
 const express = require('express');
 
 const app = express();
@@ -26,7 +26,7 @@ app.get('/', (req, res) => res.send('API running'))
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-"""
+```
 
 Start the server with:
 
@@ -36,12 +36,12 @@ Start the server with:
 
 In `package.json' copy this code in the script key:
 
-"""
+```
 "scripts": {
     "start": "node server",
     "server": "nodemon server"
 }
-"""
+```
 
 Now we can start the server in multiple different ways.
 
@@ -51,15 +51,15 @@ Create a folder in the root called `config'. The installed package called `confi
 
 Create `default.json', which is used by the `config' package, and paste this code into it. This is the connection to our MongoDB Atlas server.
 
-"""
+```
 {
 "mongoURI": "mongodb+srv://dev:g7c76wh5Ro3MJDLO@mern-cluster.fxx6k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 }
-"""
+```
 
 Now create `db.js' which will manage the connection to this database:
 
-"""
+```
 const mongoose = require('mongoose');
 const config = require('config');
 const db = config.get('mongoURI');
@@ -81,7 +81,7 @@ const connectDB = async () => {
 }
 
 module.exports = connectDB;
-"""
+```
 
 #### 5. Create routes for our server
 
@@ -91,7 +91,7 @@ These will be the routes that provide our server with different routes.
 
 For each of the route files, use the template below to fill them with this code:
 
-"""
+```
 const express = require('express');
 const router = express.Router();
 
@@ -101,7 +101,7 @@ const router = express.Router();
 router.get('/', (req, res) => res.send('User route'));
 
 module.exports = router;
-"""
+```
 
 #### 6. Create models for each of our resources
 
@@ -109,7 +109,7 @@ Create a folder in root called `models' and create a JS file to define the schem
 
 Use the below code as a template:
 
-"""
+```
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -136,13 +136,13 @@ const UserSchema = new mongoose.Schema({
 });
 
 module.exports = User = mongoose.model('user', UserSchema);
-"""
+```
 
 #### 7. Update API routes with validation
 
 In the `routes/api' files, update these routes with the correct validation and response if validation does not pass. For example in `users.js':
 
-"""
+```
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
@@ -176,5 +176,5 @@ router.post('/', [
 );
 
 module.exports = router;
-"""
+```
 
