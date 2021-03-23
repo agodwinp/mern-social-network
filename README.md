@@ -14,7 +14,7 @@
 
 #### 4. Create starter server
 
-Create a file called `server.js' and paste the following code into it:
+Create a file called `server.js` and paste the following code into it:
 
 ```
 const express = require('express');
@@ -34,7 +34,7 @@ Start the server with:
 
 ***
 
-In `package.json' copy this code in the script key:
+In `package.json` copy this code in the script key:
 
 ```
 "scripts": {
@@ -47,9 +47,9 @@ Now we can start the server in multiple different ways.
 
 ***
 
-Create a folder in the root called `config'. The installed package called `config' will use this directory to declare globally accessible configurations. It provides a nice way for us to abstract configuration away from the main code.
+Create a folder in the root called `config`. The installed package called `config` will use this directory to declare globally accessible configurations. It provides a nice way for us to abstract configuration away from the main code.
 
-Create `default.json', which is used by the `config' package, and paste this code into it. This is the connection to our MongoDB Atlas server.
+Create `default.json`, which is used by the `config` package, and paste this code into it. This is the connection to our MongoDB Atlas server.
 
 ```
 {
@@ -57,7 +57,7 @@ Create `default.json', which is used by the `config' package, and paste this cod
 }
 ```
 
-Now create `db.js' which will manage the connection to this database:
+Now create `db.js` which will manage the connection to this database:
 
 ```
 const mongoose = require('mongoose');
@@ -85,7 +85,7 @@ module.exports = connectDB;
 
 #### 5. Create routes for our server
 
-For each of the routes, we want to break them up inot separate resources and have a specific JS file for each route. Within the root folder, create a directory called `routes/api' and within this folder create files for the different routes: `auth.js', `posts.js', `profile.js' and `users.js'.
+For each of the routes, we want to break them up inot separate resources and have a specific JS file for each route. Within the root folder, create a directory called `routes/api` and within this folder create files for the different routes: `auth.js`, `posts.js`, `profile.js` and `users.js`.
 
 These will be the routes that provide our server with different routes.
 
@@ -105,7 +105,7 @@ module.exports = router;
 
 #### 6. Create models for each of our resources
 
-Create a folder in root called `models' and create a JS file to define the schema for each of the collections to be used within our MongoDB database.
+Create a folder in root called `models` and create a JS file to define the schema for each of the collections to be used within our MongoDB database.
 
 Use the below code as a template:
 
@@ -140,7 +140,7 @@ module.exports = User = mongoose.model('user', UserSchema);
 
 #### 7. Update API routes with validation
 
-In the `routes/api' files, update these routes with the correct validation and response if validation does not pass. For example in `users.js':
+In the `routes/api` files, update these routes with the correct validation and response if validation does not pass. For example in `users.js':
 
 ```
 const express = require('express');
@@ -295,7 +295,7 @@ jwt.sign(
 
 What we now need is send that token back to the server so that we can authenticate and access protected routes.
 
-First create  custom middleware in a root folder called `middleware'. Create file called `auth/js' with the following code:
+First create  custom middleware in a root folder called `middleware`. Create file called `auth/js` with the following code:
 
 ```
 const jwt = require('jsonwebtoken');
@@ -327,7 +327,7 @@ module.exports = function(req, res, next) {
 
 If the token if verified, the users information is saved within the request to be used when authenticating user access for protected routes. 
 
-Now we want to protect routes with this middleware. We do this by importing the middleware in our routes and adding it as the second parameter in the route. For example with the route `auth.js':
+Now we want to protect routes with this middleware. We do this by importing the middleware in our routes and adding it as the second parameter in the route. For example with the route `auth.js`:
 
 ```
 const express = require('express');
@@ -342,12 +342,12 @@ router.get('/', auth, (req, res) => res.send('Auth route'));
 module.exports = router;
 ```
 
-You can test this token authentication by copying the token that was returned in Postman when we registered, and adding it to a new GET requests header as the value of the key = `x-auth-token'. Make a GET request to http://localhost:5000/api/auth and you should be returned a success message.
+You can test this token authentication by copying the token that was returned in Postman when we registered, and adding it to a new GET requests header as the value of the key = `x-auth-token`. Make a GET request to http://localhost:5000/api/auth and you should be returned a success message.
 
 
 ***
 
-Now that this middleware is created, we can add some logic to the protected routes. For example in the `auth.js' route, we can make an async route that gets the user from the DB based on the user information that we saved in the request and return this to the user.
+Now that this middleware is created, we can add some logic to the protected routes. For example in the `auth.js` route, we can make an async route that gets the user from the DB based on the user information that we saved in the request and return this to the user.
 
 #### 11. Login route
 
@@ -355,7 +355,7 @@ Very similar to the auth route, but this time only using the email and password 
 
 #### 12. Creating the profile model
 
-We now want to create a profile model in the `models' folder, name the file `Profile.js'. The difference with this model is that we want to make a reference to the user model, i.e. link a unique key. The profile model is shown below and demonstrates an example of using arrays as a column:
+We now want to create a profile model in the `models` folder, name the file `Profile.js`. The difference with this model is that we want to make a reference to the user model, i.e. link a unique key. The profile model is shown below and demonstrates an example of using arrays as a column:
 
 ```
 const mongoose = require('mongoose');
