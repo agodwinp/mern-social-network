@@ -291,3 +291,7 @@ jwt.sign(
 );
 ```
 
+#### 10. Custom middleware to authenticate & verify JWT
+
+What we now need is send that token back to the server so that we can authenticate and access protected routes.
+
