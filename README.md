@@ -270,5 +270,24 @@ Anything that returns a promise you want to make sure you put an await in front 
 
 #### 9. Implementing JSON Web Tokens
 
+We are using JWT to assign web tokens when a user registers & signs in in order to authenticate users to access protected resources. To create a JWT after registration, use this code below after saving the user instance:
 
+```
+// return json web token (JWT)
+const payload = {
+    user: {
+        id: user.id
+    }
+}
+
+jwt.sign(
+    payload,
+    config.get('jwtSecret'),
+    { expiresIn: 360000 },
+    (err, token) => {
+        if (err) throw err;
+        res.json({ token })
+    }
+);
+```
 
