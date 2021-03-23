@@ -295,3 +295,185 @@ jwt.sign(
 
 What we now need is send that token back to the server so that we can authenticate and access protected routes.
 
+First create  custom middleware in a root folder called `middleware'. Create file called `auth/js' with the following code:
+
+```
+const jwt = require('jsonwebtoken');
+const config = require('config');
+
+// a middleware function is a function that has access to the request
+// and response cycle. 'next' is a callback that we have to run once
+// we're done so that it moves onto the next piece of middleware
+
+module.exports = function(req, res, next) {
+    // get token from header
+    const token = req.header('x-auth-token');
+
+    // check if no token
+    if (!token) {
+        return res.status(401).json({ msg: "No token, authorisation denied" })
+    }
+
+    // verify token
+    try {
+        const decoded = jwt.verify(token, config.get('jwtSecret'));
+        req.user = decoded.user;
+        next();
+    } catch(err) {
+        res.status(401).json({ msg: "Token is not valid" });
+    }
+}
+```
+
+If the token if verified, the users information is saved within the request to be used when authenticating user access for protected routes. 
+
+Now we want to protect routes with this middleware. We do this by importing the middleware in our routes and adding it as the second parameter in the route. For example with the route `auth.js':
+
+```
+const express = require('express');
+const router = express.Router();
+const auth = require('../../middleware/auth');
+
+// @route   GET api/auth
+// @desc    Test route
+// @access  Public
+router.get('/', auth, (req, res) => res.send('Auth route'));
+
+module.exports = router;
+```
+
+You can test this token authentication by copying the token that was returned in Postman when we registered, and adding it to a new GET requests header as the value of the key = `x-auth-token'. Make a GET request to http://localhost:5000/api/auth and you should be returned a success message.
+
+
+***
+
+Now that this middleware is created, we can add some logic to the protected routes. For example in the `auth.js' route, we can make an async route that gets the user from the DB based on the user information that we saved in the request and return this to the user.
+
+#### 11. Login route
+
+Very similar to the auth route, but this time only using the email and password of the user.
+
+#### 12. Creating the profile model
+
+We now want to create a profile model in the `models' folder, name the file `Profile.js'. The difference with this model is that we want to make a reference to the user model, i.e. link a unique key. The profile model is shown below and demonstrates an example of using arrays as a column:
+
+```
+const mongoose = require('mongoose');
+
+const ProfileSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+    },
+    company: {
+        type: String
+    },
+    website: {
+        type: String
+    },
+    location: {
+        type: String
+    },
+    status: {
+        type: String,
+        required: true
+    },
+    skills: {
+        type: [String],
+        required: true
+    },
+    bio: {
+        type: String
+    },
+    githubusername: {
+        type: String
+    },
+    experience: [
+        {
+            title: {
+                type: String,
+                required: true
+            },
+            company: {
+                type: String,
+                required: true
+            },
+            location: {
+                type: String
+            },
+            from: {
+                type: Date,
+                required: true
+            },
+            to: {
+                type: Date
+            },
+            current: {
+                type: Boolean,
+                required: true
+            },
+            description: {
+                type: String
+            }
+        }
+    ],
+    education: [
+        {
+            school: {
+                type: String,
+                required: true
+            },
+            degree: {
+                type: String,
+                required: true
+            },
+            fieldofstudy: {
+                type: String
+            },
+            from: {
+                type: Date,
+                required: true
+            },
+            to: {
+                type: Date
+            },
+            current: {
+                type: Boolean,
+                required: true
+            },
+            description: {
+                type: String
+            }
+        }
+    ],
+    social : {
+        youtube: {
+            type: String
+        },
+        twitter: {
+            type: String
+        },
+        facebook: {
+            type: String
+        },
+        linkedin: {
+            type: String
+        },
+        instagram: {
+            type: String
+        }
+    },
+    date: {
+        type: Date.apply,
+        default: Date.now
+    }
+});
+
+module.exports = Profile = mongoose.model('profile', ProfileSchema);
+```
+
+
+
+
+
+
