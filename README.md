@@ -1004,5 +1004,11 @@ router.delete('/:id', auth, async (req, res) => {
 module.exports = router;
 ```
 
+*** 
 
+Now we want to be able to like, unlike and comment on a post
+
+```
+
+```
 
