@@ -1,5 +1,9 @@
 # mern-social-network
 
+## Build the Node JS, Express & MongoDB backend
+
+***
+
 #### 1. Initialise package.json
 
     $ npm init
@@ -1168,4 +1172,39 @@ router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
     }
 });
 ```
+
+## Build the React & Redux frontend
+
+#### 21. React app setup
+
+First we need to create our react app. Go to the root directory of the project and run the following command:
+
+    $ npx create-react-app client
+
+This will create our react app in a folder called `client`. Now if you go into the `client` directory and run `npm start`, this will start your react app server on port 3000, which you can visit in the browser.
+
+The problem we have is that we need to run the Node JS server and the React server at the same time. We use concurrently to manage this. To do this, update the "scripts" key inside of the roor `package.json` to:
+
+```
+"scripts": {
+    "start": "node server",
+    "server": "nodemon server",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+}
+```
+
+Now our `dev` script will run both the backend development server and the client server.
+
+We need to install some dependencies for the client.
+
+```
+cd client
+
+npm install axios react-router-dom redux react-redux redux-thunk redux-devtools-extension
+```
+
+Lastly within the `client/package.json` we need to make a proxy. This is because when we make a request with axios, we dont have to want to write the same prefix to the URI every time, e.g. `http://localhost:5000`. We can do this by creating a proxy.
+
+
 
