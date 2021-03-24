@@ -1206,5 +1206,7 @@ npm install axios react-router-dom redux react-redux redux-thunk redux-devtools-
 
 Lastly within the `client/package.json` we need to make a proxy. This is because when we make a request with axios, we dont have to want to write the same prefix to the URI every time, e.g. `http://localhost:5000`. We can do this by creating a proxy.
 
+#### 22. Clean up frontend and use initial components
 
+When creating components, if you type `racf` then hit enter, it will automatically create a react arrow component function for you.
 
