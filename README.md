@@ -1439,6 +1439,8 @@ In this example, `formData` is our state and to update the state we have to call
 Now we want to create a Redux action to make a request to the backend.
 
 #### 25. Implement Redux for app level state
+
+https://react-redux.js.org/introduction/getting-started
  
 We can use Redux to hold user, profile, alerts etc... that are needed across the entire application.
 
