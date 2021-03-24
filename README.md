@@ -762,3 +762,124 @@ router.put('/experience', [
 });
 ```
 
+We can also remove an experience from the array using the following route:
+
+```
+// @route   DELETE api/profile/experience/:exp_id
+// @desc    Delete experience from profile
+// @access  Private
+router.delete('/experience/:exp_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.user.id });
+
+        // get the remove index
+        const removeIndex = profile.experience.map(
+            item => item.id
+        ).indexOf(req.params.exp_id);
+        
+        // splice (remove) it from the array
+        profile.experience.splice(removeIndex, 1);
+
+        await profile.save();
+
+        res.json(profile);
+        
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).send("Server error");
+    }
+});
+```
+
+We can use a two similar routes for education.
+
+#### 18. Get GitHub repositories for profile
+
+Create a token for our app within `settings > Developer settings` and use this token to grab Github repo information based on a username. Save the token within `config/default.json`.
+
+```
+// @route   GET api/profile/github/:username
+// @desc    Get user repos from Github
+// @access  Public
+router.get('/github/:username', async (req, res) => {
+
+    try {
+        const uri = encodeURI(
+            `https://api.github.com/users/${req.params.username}/repos?per_page=5&sort=created:asc`
+        );
+        const headers = {
+            'user-agent': 'node.js',
+            Authorization: `token ${config.get('githubToken')}`
+        };
+          
+        const gitHubResponse = await axios.get(uri, { headers });
+        return res.json(gitHubResponse.data);
+        
+    } catch (err) {
+        console.error(err.message);
+        return res.status(500).send("Server error");
+    }
+});
+```
+
+#### 19. Creating the Post model
+
+Create a model to contain the posts that people may create on the website:
+
+```
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const PostSchema = new Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'user'
+    },
+    text: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String
+    },
+    avatar: {
+        type: String
+    },
+    likes: [
+        {
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            }
+        }
+    ],
+    comments: [
+        {
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: 'user'
+            },
+            text: {
+                type: String,
+                required: true,
+                name: {
+                    type: String
+                },
+                avatar: {
+                    type: String
+                },
+                date: {
+                    type: Date,
+                    default: Date.now
+                }
+            }
+        }
+    ],
+    date: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+module.exports = Post = mongoose.model('post', PostSchema);
+```
