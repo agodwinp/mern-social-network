@@ -1208,5 +1208,236 @@ Lastly within the `client/package.json` we need to make a proxy. This is because
 
 #### 22. Clean up frontend and use initial components
 
-When creating components, if you type `racf` then hit enter, it will automatically create a react arrow component function for you.
+**Note:** When creating components, if you type `racfe` then hit enter, it will automatically create a react arrow component function for you.
+
+We're going to create our navbar and landing components and import these into the `App.js` file.
+
+Within `src`, create a folder called `components/layout` and create two files, `Navbar.js` and `Landing.js`. Create boilerplate code using `racfe` and then adjust the code to the following:
+
+**Navbar.js**
+
+```
+import React from 'react'
+
+const Navbar = () => {
+    return (
+        <nav className="navbar bg-dark">
+            <h1>
+                <a href="index.html"><i className="fas fa-code"></i> DevConnector</a>
+            </h1>
+            <ul>
+                <li><a href="profiles.html">Developers</a></li>
+                <li><a href="register.html">Register</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    )
+}
+
+export default Navbar
+```
+
+**Landing.js**
+
+```
+import React from 'react'
+
+const Landing = () => {
+    return (
+        <section className="landing">
+            <div className="dark-overlay">
+                <div className="landing-inner">
+                <h1 className="x-large">Developer Connector</h1>
+                <p className="lead">
+                    Create a developer profile/portfolio, share posts and get help from
+                    other developers
+                </p>
+                <div className="buttons">
+                    <a href="register.html" className="btn btn-primary">Sign Up</a>
+                    <a href="login.html" className="btn btn-light">Login</a>
+                </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+
+export default Landing;
+```
+
+Make sure you also update the CSS to be using the template CSS code. Finally, update the `App.js` file as follows:
+
+```
+import React, { Fragment } from 'react';
+import Navbar from './components/layout/Navbar';
+import Landing from './components/layout/Landing';
+import './App.css';
+
+const App = () => {
+	return (
+		<Fragment>
+			<Navbar/>
+			<Landing/>
+		</Fragment>
+	);
+}
+
+export default App;
+```
+
+Now you should see the updated React app on http://localhost:3000
+
+#### 23. React router setup
+
+We want pages to link to other pages when the user clicks on particular elements. We can do this using the React Router. We can also use Switch to render different content based on what location you are on. Switch renders a route exclusively, unlike Route: https://reactrouter.com/core/api/Switch
+
+In `App.js` use the switch to toggle between different content depending on the route:
+
+```
+import React, { Fragment } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Navbar from './components/layout/Navbar';
+import Landing from './components/layout/Landing';
+import Register from './components/auth/Register';
+import Login from './components/auth/Login';
+import './App.css';
+
+const App = () => {
+	return (
+		<Router>
+			<Fragment>
+				<Navbar/>
+				<Route exact path="/" component={ Landing }/>
+				<section className="container">
+					<Switch>
+						<Route exact path="/register" component={ Register }/>
+						<Route exact path="/login" component={ Login }/>
+					</Switch>
+				</section>
+			</Fragment>
+		</Router>
+	);
+}
+
+export default App;
+
+```
+
+Now we want to create the register and login components. Create a new folder called `src/components/auth` and create two files `Login.js` and `Register.js`. Use the code below for `Register.js` to fill in both files:
+
+```
+import React from 'react'
+
+const Register = () => {
+    return (
+        <div>
+            Register
+        </div>
+    )
+}
+
+export default Register
+```
+
+Finally, we also want to link to these two pages from the landing page. Update the landing page to look like this:
+
+```
+import React from 'react'
+import { Link } from 'react-router-dom';
+
+const Landing = () => {
+    return (
+        <section className="landing">
+            <div className="dark-overlay">
+                <div className="landing-inner">
+                <h1 className="x-large">Developer Connector</h1>
+                <p className="lead">
+                    Create a developer profile/portfolio, share posts and get help from
+                    other developers
+                </p>
+                <div className="buttons">
+                    <Link to="/register" className="btn btn-primary">Sign Up</Link>
+                    <Link to="/login" className="btn btn-light">Login</Link>
+                </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+
+export default Landing;
+```
+
+#### 24. Register & useState Hook
+
+Since the register route is a form, we should make use of the state for the form data. We can use `useState` from 'react' package to manage this. We also can make use of the `onChange` attribute within the HTML inputs to update the state.
+
+Update `Register.js` to look like this:
+
+```
+import React, { Fragment, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+const Register = () => {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        password2: ''
+    });
+
+    const { name, email, password, password2 } = formData;
+
+    const onChange = e => setFormData({
+        ...formData, // make a copy of formData
+        [e.target.name]: e.target.value
+    });
+
+    const onSubmit = e => {
+        e.preventDefault();
+        if (password !== password2) {
+            console.log('Password do not match');
+        } else {
+            console.log(formData);
+        }
+    }
+
+    return (
+        <Fragment>
+            <h1 className="large text-primary">Sign Up</h1>
+            <p className="lead"><i className="fas fa-user"></i> Create Your Account</p>
+            <form className="form" onSubmit={e => onSubmit(e)}>
+                <div className="form-group">
+                    <input type="text" placeholder="Name" name="name" value={name} onChange={e => onChange(e)} required/>
+                </div>
+                <div className="form-group">
+                    <input type="email" placeholder="Email Address" name="email" value={email} onChange={e => onChange(e)} required/>
+                    <small className="form-text">
+                        This site uses Gravatar so if you want a profile image, use a Gravatar email
+                    </small>
+                </div>
+                <div className="form-group">
+                    <input type="password" placeholder="Password" name="password" minLength="6" value={password} onChange={e => onChange(e)} required/>
+                </div>
+                <div className="form-group">
+                    <input type="password" placeholder="Confirm Password" name="password2" minLength="6" value={password2} onChange={e => onChange(e)} required/>
+                </div>
+                <input type="submit" className="btn btn-primary" value="Register" />
+            </form>
+            <p className="my-1">
+                Already have an account? <Link to="/login">Sign In</Link>
+            </p>
+        </Fragment>
+    )
+}
+
+export default Register
+```
+
+In this example, `formData` is our state and to update the state we have to call the `setFormData` function. As you can see, this function is called onChange of any of the input variables.
+
+Now we want to create a Redux action to make a request to the backend.
+
+#### 25. Request Redux action & Login form
+
 
