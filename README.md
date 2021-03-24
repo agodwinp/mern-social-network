@@ -1442,3 +1442,19 @@ Now we want to create a Redux action to make a request to the backend.
  
 We can use Redux to hold user, profile, alerts etc... that are needed across the entire application.
 
+Redux is a state manager. We have **component level state** in React, such as within the Register and Login forms that we've created with the input fields. But with things liker authentication, profiles, posts etc... these are **app level state** items and this is where Redux comes in, it gives us app level state.
+
+We can submit actions to Redux based on events and we can then get data to fall down into any component.
+
+For example with the Profile. The profile data that we get from the server, this gets put into what we call a **Redux store**. We fire off an action to fetch the data and that gets put into the store. From any component we can call a **Redux Action** that will do something, e.g. update a profile. So it will make a request to the server, make the update on the server, get a response and then we want to update the UI. So any component that needs to be updating will be done through what's called a **Reducer**. A Reducer is just a function that takes in an Action. So we dispatch an Action to the Reducer. Then the Reducer decides how to handle the state and how to pass it down to the components in the UI. It will update any components that use that piece of state. This prevents us from passing things around between components. 
+
+`Call an Action > dispatch an action to a Reducer > Reducer's decide what to do with that state (e.g delete a post, update profile,...) > send state back to components that need it`
+
+For this application we will have several reducers:
+
+- Auth reducer: this will handle everything to do with authentication
+- Profile reducer: to handle profile information
+- Posts reducer: to handle posts
+- Alert reducer: to handle alerts that will appear on screen
+
+![Redux example](redux.png)
