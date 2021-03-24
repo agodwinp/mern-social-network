@@ -630,3 +630,80 @@ router.post('/', [
 
 module.exports = router;
 ```
+
+#### 15. Get all profiles and individual profile by ID
+
+Now we want to create a route that gets all profiles and also gets one profile by a specific ID. We do this using the following code. Note: we add some specific error handling for invalid user IDs. We don't want to tell the client that a user ID does or does not exist, this may cause a security risk. Instead, we indicate that a profile can't be found. 
+
+```
+// @route   GET api/profile
+// @desc    Get all profiles
+// @access  Public
+router.get('/', async (req, res) => {
+    try {
+        const profiles = await Profile.find().populate(
+            'user', // populate from the user collection
+            ['name', 'avatar'] //populate just these two columns
+        );
+        res.json(profiles);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server error");
+    }
+});
+
+// @route   GET api/profile/user/:user_id
+// @desc    Get profile by user ID
+// @access  Public
+router.get('/user/:user_id', async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.params.user_id }).populate(
+            'user', // populate from the user collection
+            ['name', 'avatar'] //populate just these two columns
+        );
+
+        if (!profile) {
+            return res.status(400).json({ msg: "Profile not found" });
+        }
+
+        res.json(profile);
+    } catch (err) {
+        console.error(err.message);
+        // if user ID is invalid
+        if (err.kind == 'ObjectId') {
+            return res.status(400).json({ msg: "Profile not found" });
+        }
+        res.status(500).send("Server error");
+    }
+});
+```
+
+#### 16. Delete profile & user
+
+We want to be able to delete a profile and an associated user completely.
+
+```
+// @route   DELETE api/profile
+// @desc    Delete profile, user and posts
+// @access  Private
+router.delete('/', auth, async (req, res) => {
+    try {
+        // @todo remove users posts
+
+        // remove profile
+        await Profile.findOneAndRemove({ user: req.user.id });
+
+        // remove user
+        await User.findOneAndRemove({ _id: req.user.id });
+
+        res.json({ msg: "User deleted" });
+        
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send("Server error");
+    }
+});
+```
+
+#### 17. Create seperate routes to populate experience & education array
+
