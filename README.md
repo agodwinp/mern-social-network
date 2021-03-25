@@ -1754,5 +1754,100 @@ https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow
 
  #### 29. Auth reducer & register action
 
+The auth reducer updates the state based on successful or failed registration. If successful, the reducer updates the state with a spread of the state & payload but sets isAuthenticated to true and loading to false, to show that the user is authenticated and loading does not need to be done.
 
- 
+```
+import {
+    REGISTER_SUCCESS,
+    REGISTER_FAIL
+} from '../actions/types';
+
+const initialState = {
+    token: localStorage.getItem('token'),
+    isAuthenticated: null,
+    loading: true, // this is to indicate whether we have the response and it's been loaded ==> it is currently loading (true)
+    user: null
+}
+
+function authReducer(state = initialState, action) {
+    const { type, payload } = action;
+
+    switch(type) {
+        case REGISTER_SUCCESS:
+            localStorage.setItem('token', payload.token);
+            return {
+                ...state,
+                ...payload,
+                isAuthenticated: true,
+                loading: false // we've got the response and it's been loaded ==> false
+            }
+        case REGISTER_FAIL:
+            localStorage.removeItem('token');
+            return {
+                ...state,
+                token: null,
+                isAuthenticated: false,
+                loading: false // we've got the response and it's been loaded ==> false
+            }
+        default:
+            return state;
+
+    }
+}
+
+export default authReducer;
+```
+
+The register action takes in the name, email and password from the register component state and makes an asynchronous request to our backend API to register a user. If it is successful, a success message appears. If not, failure messages appear. 
+
+```
+import axios from 'axios';
+import { setAlert } from './alert';
+import { REGISTER_SUCCESS, REGISTER_FAIL } from "./types";
+
+// register user
+export const register = ({ name, email, password }) => async dispatch => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+    const body = JSON.stringify({ name, email, password });
+
+    try {
+        const res = await axios.post('/api/users', body, config);
+        
+        dispatch({
+            type: REGISTER_SUCCESS,
+            payload: res.data
+        });
+
+        dispatch(setAlert('Registration complete!', 'success'));
+
+    } catch (err) {
+        const errors = err.response.data.errors;
+        if (errors) {
+            errors.forEach(
+                error => dispatch(
+                    setAlert(error.msg, 'danger')
+                )
+            );
+        }   
+
+        dispatch({
+            type: REGISTER_FAIL
+        });
+        
+    }
+}
+```
+
+#### 30. Load user & set auth token
+
+Now we want to handle the whole process of taking a token that we have stored, sending it to the backend for validation and then loading the user. We want that to happen every time the main app commponent is loaded. 
+
+1. Create a new action in the `auth.js` file called `loadUser`. This function needs to check to see if there is a token and if there is, put it into a global header within localStorage, if there is not, delete it from the headers. We will do this within a separate file called `utils/setAuthToken.js`. This means that if there is a token, we can send it with every request.
+2. Integrate it into `App.js` with the `useEffect` hook. The way we dispatch the `loadUser` action from App.js is with the useEffect hook. Within the useEffect hook, can take the Redux store directly and we call dispatch. The effect hook allows you to perform side effects in function components: https://reactjs.org/docs/hooks-effect.html.
+
+#### 31. USer login
+
