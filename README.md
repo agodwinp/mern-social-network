@@ -1625,3 +1625,110 @@ The flow goes: `Action is fired > action is dispatched to the reducer > reducer 
 
 #### 28. Alert component & action call
 
+We can call this action from the Register.js page, for example when someones passwords do not match. Instead of doing console.log(), we can use the `setAlert` action to dispatch to the reducer and update the state. We have to do a few things to make this work:
+
+- Import `connect` from react-redux to connect the component to redux.
+- Import setAlert from our actions folder.
+- Update the export default to connect our component to redux. To use the actions within a component, you have to pass it into connect(). The connect() call takes two parameters, the first is any state that you want to map and the second is an object of all the actions you want to use.
+- By connecting our component to redux, this allows us to access props from within the component.
+- By adding this as a parameter in the parent arrow function, we can then access the setAlert action as a method within props.
+
+The code for `Register.js` should now look like this:
+
+```
+import React, { Fragment, useState } from 'react';
+import { Link } from 'react-router-dom';
+// import axios from 'axios';
+import { connect } from 'react-redux';
+import { setAlert } from '../../actions/alert';
+import PropTypes from 'prop-types'
+
+const Register = ({ setAlert }) => {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        password2: ''
+    });
+
+    const { name, email, password, password2 } = formData;
+
+    const onChange = e => setFormData({
+        ...formData, // make a copy of formData
+        [e.target.name]: e.target.value
+    });
+
+    const onSubmit = async e => {
+        e.preventDefault();
+        if (password !== password2) {
+            setAlert('Password do not match', 'danger', 5000);
+        } else {
+            setAlert('Welcome', 'success', 3000);
+        }
+    }
+
+    return (
+        <Fragment>
+            <h1 className="large text-primary">Sign Up</h1>
+            <p className="lead"><i className="fas fa-user"></i> Create Your Account</p>
+            <form className="form" onSubmit={e => onSubmit(e)}>
+                <div className="form-group">
+                    <input type="text" placeholder="Name" name="name" value={name} onChange={e => onChange(e)} required/>
+                </div>
+                <div className="form-group">
+                    <input type="email" placeholder="Email Address" name="email" value={email} onChange={e => onChange(e)} required/>
+                    <small className="form-text">
+                        This site uses Gravatar so if you want a profile image, use a Gravatar email
+                    </small>
+                </div>
+                <div className="form-group">
+                    <input type="password" placeholder="Password" name="password" minLength="6" value={password} onChange={e => onChange(e)} required/>
+                </div>
+                <div className="form-group">
+                    <input type="password" placeholder="Confirm Password" name="password2" minLength="6" value={password2} onChange={e => onChange(e)} required/>
+                </div>
+                <input type="submit" className="btn btn-primary" value="Register" />
+            </form>
+            <p className="my-1">
+                Already have an account? <Link to="/login">Sign In</Link>
+            </p>
+        </Fragment>
+    )
+}
+
+Register.propTypes = {
+    setAlert: PropTypes.func.isRequired
+}
+
+export default connect(null, { setAlert })(Register);
+
+```
+
+***
+
+Now we want to create an Alert component within `src/components/Alert.js`. By typing `racfp` this will automatically create a react arrow function component with prop types. We want to give this component access to the reducer, so we need to bring in `connect` again. Also, we want to map the state of the alert to a prop, so we need to create a function that makes the alert reducer available. The line `alerts: state.alert` assigns the `alert` in `reducers/index.js` to `alerts` as prop within this component. Props are input to a component: https://reactjs.org/docs/components-and-props.html. The code for `Alert.js` is below:
+
+```
+import React from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+
+const Alert = ({ alerts }) =>
+    alerts.map((alert) => (
+        <div key={alert.id} className={`alert alert-${alert.alertType}`}>
+            {alert.msg}
+        </div>
+    ));
+
+Alert.propTypes = {
+    alerts: PropTypes.array.isRequired
+};
+
+const mapStateToProps = (state) => ({
+    alerts: state.alert
+});
+
+export default connect(mapStateToProps)(Alert);
+```
+
+**Note:** Every time you loop through an array, such as with the map function, if you're returning JSX as a list (which we are in this case), you need to assign a unique key for each iteration. You can do this using the `id`.
