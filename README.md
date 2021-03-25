@@ -2002,3 +2002,43 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, { logout })(Navbar);
 ```
 
+#### 33. Protected route for dashboard
+
+Some routes we want to protect so that only authenticated users can access them. 
+
+We are going to do this by creating a `PrivateRoute` component, to protect specific routes.
+
+We create `components/routing/PrivateRoute.js` and use the following code to create a private route:
+
+```
+import React from 'react'
+import { Route, Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux';
+
+
+const PrivateRoute = (
+    { component: Component, auth: { isAuthenticated, loading }, ...rest }
+)  => ( // we're de-structuring the component prop being passed in, grabbing the Component and '...rest' grabs anything else that's passed in
+
+    <Route { ...rest } render={
+        props => !isAuthenticated && !loading ? (
+            <Redirect to="/login" />
+        ) : (
+            <Component {...props} />
+        )
+    }/>
+)
+
+PrivateRoute.propTypes = {
+    auth: PropTypes.object.isRequired
+}
+
+const mapStateToProps = state => ({
+    auth: state.auth    
+});
+
+export default connect(mapStateToProps)(PrivateRoute);
+```
+
+We then just have to change the route in `App.js` to be a PrivateRoute instead of a Route.
