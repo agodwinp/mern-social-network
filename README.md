@@ -1460,3 +1460,5 @@ For this application we will have several reducers:
 - Alert reducer: to handle alerts that will appear on screen
 
 ![Redux example](redux.png)
+
+#### 26. Creating a Redux store
