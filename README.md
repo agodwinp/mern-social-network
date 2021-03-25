@@ -1732,3 +1732,24 @@ export default connect(mapStateToProps)(Alert);
 ```
 
 **Note:** Every time you loop through an array, such as with the map function, if you're returning JSX as a list (which we are in this case), you need to assign a unique key for each iteration. You can do this using the `id`.
+
+The flow of data through Redux is as follows:
+
+https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow
+
+**Initial setup**
+
+- A Redux store is created using combineReducers in the root reducer function
+- The store called the root reducer once and saves the return value as its initial state
+- When the UI is first rendered, UI components access the current state of the Redux store, and use that data to decide what to render. They also subscribe to any future store updates so they can know if the state has changed.
+
+**Updates**
+ 
+ - Something happens in the app, such as a user clicking a button
+ - The app code dispatches an action to the Redux store
+ - The store runs the reducer function again with the previous state and the current action and saves the return value as the new state
+ - The store notifies all parts of the UI that are subscribed, that the store has been updated
+ - Each UI component that needs data from the store checks to see if parts of the state they need has changed
+ - Each component that sees its data has changed forces a re-render with the new data, so it can update what's shown on screen.
+
+ 
