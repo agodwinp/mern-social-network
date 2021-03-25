@@ -1752,4 +1752,7 @@ https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow
  - Each UI component that needs data from the store checks to see if parts of the state they need has changed
  - Each component that sees its data has changed forces a re-render with the new data, so it can update what's shown on screen.
 
+ #### 29. Auth reducer & register action
+
+
  
