@@ -1542,3 +1542,86 @@ Now if you go to the website and open up the Redux Dev Tools within the console,
 
 #### 27. Alert reducer, action & types
 
+First we want to create a new file called `alert.js` within `src/reducers`. This will house our alert reducer and should be imported within `index.js`. We declare the initial state as an empty array, each object within this array may look like the following:
+
+```
+{
+    'id': '',
+    'msg: '',
+    'alertType': ''
+}
+```
+
+We can use the information within this object to determine what type of alert to display. 
+
+We then create the reducer function, which takes the initial state and an action as input. We determine how to update the state based on the `action.type` and switch cases. Cases should be defined as variables. So we are also going to hard code these into a folder of their own `src/actions/types.js`. This gives us a single centralised place for all our action types. Note: the action has two things inside of it, the type and the payload. The type is what we use to determine how to update the state based on the action type, the payload is any data that we need based on the action type. e.g. for SET_STATE, the payload will be the object above with 3 keys. But for REMOVE_STATE, it will be just an `id`.
+
+Now to define the action object for each reducer, we need to create a new file called `alert.js` within `src/actions/`. This is where the actions will be dispatched from to call the cases within the reducer. Within `actions/alert.js` we need to provide an ID for the dispatched action. To do this, we can use the `uuid` package. 
+
+```
+cd into client/
+npm install uuid
+import { v4 as uuidv4 } from 'uuid';
+```
+
+This is the code for `reducers/alert.js`:
+
+```
+import { SET_ALERT, REMOVE_ALERT } from '../actions/types';
+
+const initialState = [];
+
+function alertReducer(state = initialState, action) {
+    const { type, payload } = action;
+
+    switch(type) {
+        case SET_ALERT:
+            return [...state, payload]; // state is immutable, therefore we need to take a copy of the current state before returning it
+        case REMOVE_ALERT:
+            return state.filter(alert => alert.id !== payload)
+        default:
+            return state;
+    }
+}
+
+export default alertReducer;
+```
+
+For `actions/types.js`:
+
+```
+export const SET_ALERT = 'SET_ALERT';
+export const REMOVE_ALERT = 'REMOVE_ALERT';
+```
+
+And finally for `actions/alert.js`:
+
+```
+import { setRandomFallback } from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
+import { SET_ALERT, REMOVE_ALERT } from './types';
+
+export const setAlert = (msg, alertType) => dispatch => {
+    const id = uuidv4();
+    dispatch({
+        type: SET_ALERT,
+        payload: {
+            id: id,
+            msg: msg,
+            alertType: alertType
+        }
+    })
+}
+```
+
+Now we have:
+
+- Our `index.js` file that combines our reducers, only alert for now.
+- Our alertReducer that takes in the state and action and and updates the state based on the action type.
+- Our centralised store of all action types
+- Our alert action which dispatches a type and payload to the reducer.
+
+The flow goes: `Action is fired > action is dispatched to the reducer > reducer updates state based on action > state is updated in components that need it`
+
+#### 28. Alert component & action call
+
