@@ -1849,5 +1849,92 @@ Now we want to handle the whole process of taking a token that we have stored, s
 1. Create a new action in the `auth.js` file called `loadUser`. This function needs to check to see if there is a token and if there is, put it into a global header within localStorage, if there is not, delete it from the headers. We will do this within a separate file called `utils/setAuthToken.js`. This means that if there is a token, we can send it with every request.
 2. Integrate it into `App.js` with the `useEffect` hook. The way we dispatch the `loadUser` action from App.js is with the useEffect hook. Within the useEffect hook, can take the Redux store directly and we call dispatch. The effect hook allows you to perform side effects in function components: https://reactjs.org/docs/hooks-effect.html.
 
-#### 31. USer login
+#### 31. User login
+
+1. First we need to create a new login action which will be very similar to the register action. 
+2. Then we need to create the new action types.
+3. After this, we need to add the action types to the reducer.
+4. Next we need a way to fire off the actions, within the component of course.
+
+We are seeing a familiar flow when building these reducers:
+
+1. Create a new action
+2. Create new action types
+3. Create or build these action types into the reducer
+4. Integrate the firing off of these actions into a component
+
+To integrate an action into a component:
+
+1. Import the action, connect & PropTypes. PropTypes will be used to make the action available as a prop in the component.
+2. Connect the component to the Reducer and pass mapStateToProps or mapDispatchToProps as parameters. This will make state available as a prop or an action available as a prop respectively. 
+3. Assign the actions to the propTypes
+4. De-structure prop using {} to extract the action as a parameter for the component.
+
+The Login component should now look like this:
+
+```
+import React, { Fragment, useState } from 'react';
+import { Link, Redirect } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { login } from '../../actions/auth';
+import PropTypes from 'prop-types'
+
+const Login = ({ login, isAuthenticated }) => {
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+
+    const { email, password } = formData;
+
+    const onChange = e => setFormData({
+        ...formData, // make a copy of formData
+        [e.target.name]: e.target.value
+    });
+
+    const onSubmit = async e => {
+        e.preventDefault();
+        login(email, password);
+    }
+
+    // redirect if logged in
+    if (isAuthenticated) {
+        return <Redirect to="/dashboard"/>
+    }
+
+    return (
+        <Fragment>
+            <h1 className="large text-primary">Sign In</h1>
+            <p className="lead"><i className="fas fa-user"></i> Sign Into Your Account</p>
+            <form className="form" onSubmit={e => onSubmit(e)}>
+                <div className="form-group">
+                    <input type="email" placeholder="Email Address" name="email" value={email} onChange={e => onChange(e)} required/>
+                </div>
+                <div className="form-group">
+                    <input type="password" placeholder="Password" name="password" minLength="6" value={password} onChange={e => onChange(e)} required/>
+                </div>
+                <input type="submit" className="btn btn-primary" value="Login" />
+            </form>
+            <p className="my-1">
+                Don't have an account? <Link to="/register">Sign Up</Link>
+            </p>
+        </Fragment>
+    )
+}
+
+Login.propTypes = {
+    login: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool
+}
+
+const mapStateToProps = (state) => ({
+    isAuthenticated: state.auth.isAuthenticated
+});
+
+export default connect(mapStateToProps, { login })(Login);
+```
+
+We have also added a small check fir Login and Register to redirect the user to the `dashboard` page if the user is authenticated, using state and `mapStateToProps`.
+
+
 
