@@ -1462,3 +1462,83 @@ For this application we will have several reducers:
 ![Redux example](redux.png)
 
 #### 26. Creating a Redux store
+
+https://redux.js.org/introduction/getting-started
+
+Inside of `src` create a file called `store.js`. This will be where we define our Redux stores.
+
+Note the 4th import, it is a relative import from a file called `index.js` within a `reducers` folder. We are going to have multiple reducers, one for auth, one for profile etc... but we are going to combine them in a `rootReducer`.
+
+Add this code into `src/store.js`:
+
+```
+import { createStore, applyMiddleware } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import thunk from 'redux-thunk';
+import rootReducer from './reducers';
+
+const initialState = {};
+
+const middleware = [thunk];
+
+const store = createStore(
+    rootReducer, 
+    initialState, 
+    composeWithDevTools(
+        applyMiddleware(...middleware)
+    )
+);
+
+export default store;
+```
+
+Now within `App.js` we need to make some imports. First we need a Provider, this will connect React & Redux because they are originally independent. We just have to wrap our entire app with this Provider to allow all the components within the app to access app level state. `App.js` should look like this now:
+
+```
+import React, { Fragment } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Navbar from './components/layout/Navbar';
+import Landing from './components/layout/Landing';
+import Register from './components/auth/Register';
+import Login from './components/auth/Login';
+import './App.css';
+// redux
+import { Provider } from 'react-redux';
+import store from './store';
+
+const App = () => {
+	return (
+		<Provider store={store}>
+			<Router>
+				<Fragment>
+					<Navbar/>
+					<Route exact path="/" component={ Landing }/>
+					<section className="container">
+						<Switch>
+							<Route exact path="/register" component={ Register }/>
+							<Route exact path="/login" component={ Login }/>
+						</Switch>
+					</section>
+				</Fragment>
+			</Router>
+		</Provider>
+	);
+}
+
+export default App;
+```
+
+Finally in `reducers/index.js`, the idea is that we will have multiple reducers in here but we can combine them together with `combineReducers`. Here is the starter code for this file:
+
+```
+import {combineReducers } from 'redux';
+
+export default combineReducers({
+
+});
+
+Now if you go to the website and open up the Redux Dev Tools within the console, you can see that we now have a Redux store.
+```
+
+#### 27. Alert reducer, action & types
+
