@@ -2155,7 +2155,7 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, { getCurrentProfile })(Dashboard);
 ```
 
-#### 35. Populating dashboard with data
+#### 35. Starting the dashboard
 
 1. First we added a spinner component to show when the user & profile was still being collected into the state. This way, the dashboard component will not be shown until the proper information is stored within the state.
 2. Then we added some basic markup within a Fragment to check whether the user has created a profile. If not, then a button will appear to redirect them to the `create-profile` route.
