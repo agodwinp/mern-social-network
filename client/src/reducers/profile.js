@@ -1,6 +1,7 @@
 import {
     GET_PROFILE,
-    PROFILE_ERROR
+    PROFILE_ERROR,
+    CLEAR_PROFILE
 } from '../actions/types';
 
 const initialState = {
@@ -29,6 +30,14 @@ function profileReducer (state = initialState, action) {
                 loading: false
             };
 
+        case CLEAR_PROFILE:
+            return {
+                ...state,
+                profile: null,
+                repos: [],
+                loading: false
+            }
+            
         default:
             return state;
     }
