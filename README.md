@@ -2042,3 +2042,117 @@ export default connect(mapStateToProps)(PrivateRoute);
 ```
 
 We then just have to change the route in `App.js` to be a PrivateRoute instead of a Route.
+
+#### 34. Profile reducer and get current profile
+
+When the user goes to the Dashboard page, we want the profile actions to be kicked off. To kick off this action as soon as the page is loaded, we use the `useEffect` hook. 
+
+First create a new action for Profile `actions/profile.js`:
+
+```
+import axios from 'axios';
+import { setAlert } from './alert';
+
+import { 
+    GET_PROFILE,
+    PROFILE_ERROR
+} from './types';
+
+// get current users profile
+export const getCurrentProfile = () => async dispatch => {
+    try {
+        const res = await axios.get('/api/profile/me');
+        
+        dispatch({
+            type: GET_PROFILE,
+            payload: res.data
+        })
+        
+    } catch (err) {
+        dispatch({
+            type: PROFILE_ERROR,
+            payload: { 
+                msg: err.response.statusText, 
+                status: err.response.status 
+            }
+        })
+    }
+}
+```
+
+Then create a reducer for this action `reducers/profile.js`:
+
+```
+import {
+    GET_PROFILE,
+    PROFILE_ERROR
+} from '../actions/types';
+
+const initialState = {
+    profile: null,
+    profiles: [],
+    repos: [],
+    loading: true,
+    error: {}
+}
+
+function profileReducer (state = initialState, action) {
+    const { type, payload } = action;
+
+    switch(type) {
+        case GET_PROFILE:
+            return {
+                ...state,
+                profile: payload,
+                loading: false
+            };
+
+        case PROFILE_ERROR:
+            return {
+                ...state,
+                error: payload,
+                loading: false
+            };
+
+        default:
+            return state;
+    }
+}
+
+export default profileReducer;
+```
+
+Finally integrate the action into the Dashboard component:
+
+```
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { getCurrentProfile } from '../../actions/profile';
+
+const Dashboard = ({ getCurrentProfile, auth, profile }) => {
+    useEffect(() => {
+        getCurrentProfile();
+    }, []);
+    return (
+        <div>
+            Dashboard
+        </div>
+    )
+};
+
+Dashboard.propTypes = {
+    getCurrentProfile: PropTypes.func.isRequired,
+    auth: PropTypes.object.isRequired,
+    profile: PropTypes.object.isRequired
+}
+
+const mapStateToProps = state => ({
+    auth: state.auth,
+    profile: state.profile
+});
+
+export default connect(mapStateToProps, { getCurrentProfile })(Dashboard);
+```
+
+#### 35. Populating dashboard with data
