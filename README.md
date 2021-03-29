@@ -2687,3 +2687,142 @@ AddExperience.propTypes = {
 export default connect(null, { addExperience })(AddExperience)
 ```
 
+#### 40. List education & experience
+
+For the experience and education components, we will be passing down the experience and education data from the parent `Dashboard.js` component. So we can add it as a prop within the props parameter for education and experience.
+
+The `components/dashboard/Experience.js` is very similar to `Education.js`. Below is the code for Experience:
+
+```
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import formatDate from '../../utils/formatDate';
+
+const Experience = ({ experience }) => { // pass in experience as a prop
+
+    const experiences = experience.map(exp => (
+        <tr key={exp._id}>
+            <td>{exp.company}</td>
+            <td className="hide-sm">{exp.title}</td>
+            <td>
+                {formatDate(exp.from)} - {exp.to ? formatDate(exp.to) : 'Now'}
+            </td>
+            <td>
+                <button className="btn btn-danger">Delete</button>
+            </td>
+        </tr>
+    ))
+    return (
+        <Fragment>
+           <h2 className="my-2">Experience Credentials</h2> 
+           <table className="table">
+               <thead>
+                   <tr>
+                       <th>Company</th>
+                       <th className="hide-sm">Title</th>
+                       <th className="hide-sm">Years</th>
+                       <th/>
+                   </tr>
+               </thead>
+               <tbody>
+                   {experiences}
+               </tbody>
+           </table>
+        </Fragment>
+    )
+}
+
+Experience.propTypes = {
+    experience: PropTypes.array.isRequired
+}
+
+export default Experience
+```
+
+#### 41. Delete experience, education & account
+
+We need to create an action to remove an account, that is ACCOUNT_DELETED. We also need to CLEAR_PROFILE when someone removes their accunt. The ACCOUNT_DELETED can live within the `auth.js` reducers since it makes use of the same capability as some of these reducers.
+
+These three actions should be implemented in `actions/profile.js`:
+
+```
+// delete experience
+export const deleteExperience = id => async dispatch => {
+    try {
+
+        const res = await axios.delete(`/api/profile/experience/${id}`);
+        dispatch({
+            type: UPDATE_PROFILE,
+            payload: res.data
+        });
+
+        dispatch(setAlert('Experience removed', 'success'));
+
+    } catch (err) {
+        dispatch({
+            type: PROFILE_ERROR,
+            payload: { 
+                msg: err.response.statusText, 
+                status: err.response.status 
+            }
+        });
+
+    }
+}
+
+// delete education
+export const deleteEducation = id => async dispatch => {
+    try {
+
+        const res = await axios.delete(`/api/profile/education/${id}`);
+        dispatch({
+            type: UPDATE_PROFILE,
+            payload: res.data
+        });
+
+        dispatch(setAlert('Education removed', 'success'));
+
+    } catch (err) {
+        dispatch({
+            type: PROFILE_ERROR,
+            payload: { 
+                msg: err.response.statusText, 
+                status: err.response.status 
+            }
+        });
+
+    }
+}
+
+// delete account & profile
+export const deleteAccount = () => async dispatch => {
+
+    if (window.confirm('Are you sure? This can NOT be undone!')) {
+
+        try {
+
+            const res = await axios.delete('/api/profile');
+            dispatch({
+                type: CLEAR_PROFILE
+            });
+            dispatch({
+                type: ACCOUNT_DELETED
+            });
+    
+            dispatch(setAlert('Your account has been permanently deleted'));
+    
+        } catch (err) {
+            dispatch({
+                type: PROFILE_ERROR,
+                payload: { 
+                    msg: err.response.statusText, 
+                    status: err.response.status 
+                }
+            });
+    
+        }
+    }
+}
+```
+
