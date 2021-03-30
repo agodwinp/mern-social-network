@@ -2971,3 +2971,180 @@ export default connect(mapStateToProps, { getProfileById })(Profile)
 
 #### 45. Profile Top and About sections
 
+We create two new components within `components/profile` called `ProfileTop.js` and `ProfileAbout.js`.
+
+ProfileTop should look like this:
+
+```
+import React from 'react'
+import PropTypes from 'prop-types'
+
+const ProfileTop = (
+    { 
+        profile : {
+            status,
+            company,
+            location,
+            website,
+            social,
+            user: { name, avatar }
+        }
+    }
+) => {
+    return (
+        <div class="profile-top bg-primary p-2">
+            <img
+                class="round-img my-1"
+                src={avatar}
+                alt=""
+            />
+            <h1 class="large">{name}</h1>
+            <p class="lead">{status}{company && <span> @ {company}</span>}</p>
+            <p>{location && <span>{location}</span>}</p>
+            <div class="icons my-1">
+                {
+                    website && (
+                        <a href={website} target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-globe fa-2x"></i>
+                        </a>
+                    )
+                }
+                {
+                    social && social.twitter && (
+                        <a href={social.twitter} target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-twitter fa-2x"></i>
+                        </a>
+                    )
+                }
+                {
+                    social && social.facebook && (
+                        <a href={social.facebook} target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-facebook fa-2x"></i>
+                        </a>
+                    )
+                }
+                {
+                    social && social.linkedin && (
+                        <a href={social.linkedin} target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-linkedin fa-2x"></i>
+                        </a>
+                    )
+                }
+                {
+                    social && social.youtube && (
+                        <a href={social.youtube} target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-youtube fa-2x"></i>
+                        </a>
+                    )
+                }
+                {
+                    social && social.instagram && (
+                        <a href={social.instagram} target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram fa-2x"></i>
+                        </a>
+                    )
+                }
+            </div>
+        </div>
+    )
+}
+
+ProfileTop.propTypes = {
+    profile: PropTypes.object.isRequired
+}
+
+export default ProfileTop
+```
+
+And ProfileAbout should look like this:
+
+```
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
+
+const ProfileAbout = ({
+    profile: {
+        bio,
+        skills,
+        user: { name }
+    }
+}) => {
+    return (
+        <div class="profile-about bg-light p-2">
+            {
+                bio && (
+                    <Fragment>
+                        <h2 class="text-primary">{name.trim().split(' ')[0]}s Bio</h2>
+                        <p>
+                            {bio}
+                        </p>
+                        <div class="line"></div>
+                    </Fragment>
+                )
+            }
+            
+            <h2 class="text-primary">Skill Set</h2>
+            <div class="skills">
+                {skills.map((skill, index) => (
+                    <div key={index} className="p-1">
+                        <i className="fas fa-check"></i> {skill}
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
+}
+
+ProfileAbout.propTypes = {
+    profile: PropTypes.object.isRequired,
+}
+
+export default ProfileAbout
+```
+
+#### 46. Profile experience and education display
+
+To show the education and experience on a profile, use the below code as an example to create two new components `components/profile/ProfileExperience.js` and `components/profile/ProfileEducation.js`.
+
+```
+import React from 'react'
+import PropTypes from 'prop-types'
+import formatDate from '../../utils/formatDate'
+
+const ProfileExperience = ({
+    experience: {
+        company, 
+        title,
+        location,
+        current,
+        to,
+        from,
+        description
+    }
+}) => {
+    return (
+        <div>
+            <h3 className="text-dark">{company}</h3>
+            <p>
+                {formatDate(from)} - {to ? formatDate(to) : 'Now'}
+            </p>
+            <p>
+                <strong>Position: </strong>{title}
+            </p>
+            <p>
+                <strong>Description: </strong>{description}
+            </p>
+        </div>
+    )
+}
+
+ProfileExperience.propTypes = {
+    experience: PropTypes.array.isRequired
+}
+
+export default ProfileExperience
+```
+
+#### 47. Displaying Github repos
+
+Now we create 3 more profile components `ProfileEducation.js`, `ProfileExperience.js` and `ProfileGithub.js`
