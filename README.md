@@ -3538,3 +3538,100 @@ export default connect(mapStateToProps, { deleteComment })(CommentItem)
 
 ***
 
+Sign up for an account at www.heroku.com and then download the CLI from this site: https://devcenter.heroku.com/articles/heroku-cli#download-and-install
+
+Login into Heroku
+
+    $ heroku login
+
+Now we need to update our application to be ready for production. First create a new config file called `config/production.json` and use the same code as in `config/default.json`.
+
+When it comes to using React as our client side, when we push to production, we no longer use the React dev server. So what we need to do is build out our static assets, and we can do that manually by:
+
+    $ cd client
+    $ npm run build
+
+This will create an optimised production build of static assets in `client/build`. You will notice an `index.html` file within the build folder which is essentially our gateway to everything, this is what we need to load when we push to production. 
+
+We now have 2 options when deploying to Heroku. We can use push our build folder that we've just created, or we can actually build it on the server using a post build script. We will do the latter. So delete the build folder in `client`.
+
+To create a build script, go into `package.json` and update it to look like this:
+
+```
+{
+  "name": "devconnector",
+  "version": "1.0.0",
+  "description": "MERN social network",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server",
+    "server": "nodemon server",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agodwinp/mern-social-network.git"
+  },
+  "author": "Arun Godwin Patel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/agodwinp/mern-social-network/issues"
+  },
+  "homepage": "https://github.com/agodwinp/mern-social-network#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.6",
+    "express": "^4.17.1",
+    "express-validator": "^6.10.0",
+    "gravatar": "^1.8.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.12.2"
+  },
+  "devDependencies": {
+    "concurrently": "^6.0.0",
+    "nodemon": "^2.0.7"
+  }
+}
+```
+
+the `heroku-postbuild` must be named exactly this and it's telling the server to install the client dependencies inside the client folder and to build the app within client too.
+
+Now `server.js` is not currently built to serve the build `index.html` file. So we need to set this up, it should now look like this:
+
+```
+const express = require('express');
+const connectDB = require('./config/db');
+const path = require('path');
+
+const app = express();
+
+// connect to database
+connectDB();
+
+// init middleware
+app.use(express.json({ extended: false }));
+
+// define routes
+app.use('/api/users', require('./routes/api/users'))
+app.use('/api/auth', require('./routes/api/auth'))
+app.use('/api/profile', require('./routes/api/profile'))
+app.use('/api/posts', require('./routes/api/posts'))
+
+// serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+    // set the static folder
+    app.use(express.static('client/build'));
+
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    });
+}
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+```
+

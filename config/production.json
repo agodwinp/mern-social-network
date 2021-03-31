@@ -1,0 +1,5 @@
+{
+    "mongoURI": "mongodb+srv://dev:g7c76wh5Ro3MJDLO@mern-cluster.fxx6k.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "jwtSecret": "mysecretJWTtoken",
+    "githubToken": "0892f0193dd45fd1f632bd5aa0c39ee7a1043755"
+}
