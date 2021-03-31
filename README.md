@@ -3148,3 +3148,7 @@ export default ProfileExperience
 #### 47. Displaying Github repos
 
 Now we create 3 more profile components `ProfileEducation.js`, `ProfileExperience.js` and `ProfileGithub.js`
+
+#### 48. Post reducer, action and initial component
+
+Create the type, reducer, action and component for the posts.
