@@ -3,7 +3,8 @@ import {
     GET_POSTS,
     POST_ERROR,
     UPDATES_LIKES,
-    ADD_POST
+    ADD_POST,
+    GET_POST
 } from '../actions/types'
 
 const initialState = {
@@ -21,6 +22,13 @@ const initialState = {
             return {
                 ...state,
                 posts: payload,
+                loading: false
+            };
+
+        case GET_POST:
+            return {
+                ...state,
+                post: payload,
                 loading: false
             };
 
