@@ -2,7 +2,8 @@ import {
     DELETE_POST,
     GET_POSTS,
     POST_ERROR,
-    UPDATES_LIKES
+    UPDATES_LIKES,
+    ADD_POST
 } from '../actions/types'
 
 const initialState = {
@@ -22,6 +23,13 @@ const initialState = {
                 posts: payload,
                 loading: false
             };
+
+        case ADD_POST:
+            return {
+                ...state,
+                posts: [payload, ...state.posts], // just add our new post onto the existing ones
+                loading: false
+            }
 
         case DELETE_POST:
             return {
