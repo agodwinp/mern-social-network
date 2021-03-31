@@ -3635,3 +3635,9 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 ```
 
+Now the app is ready to be deployed. First we want to create an app, which we did in the Web dashboard. Now we need to add Heroku as a remote repository to the git repo.
+
+
+
+
+
