@@ -3635,9 +3635,12 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 ```
 
-Now the app is ready to be deployed. First we want to create an app, which we did in the Web dashboard. Now we need to add Heroku as a remote repository to the git repo.
+Now the app is ready to be deployed. First we want to create an app, which we did in the Web dashboard. Now we need to add Heroku as a remote repository to the git repo by running this command (can be found within the app/deploy screen too):
 
+    $ heroku git:remote -a agp-mern-react-app
 
+Then push to this repo:
 
+    $ git push heroku
 
-
+Then all the files will be uploaded onto this server and the postbuild script will be run too.
