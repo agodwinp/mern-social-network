@@ -1,6 +1,7 @@
 import {
     GET_POSTS,
-    POST_ERROR
+    POST_ERROR,
+    UPDATES_LIKES
 } from '../actions/types'
 
 const initialState = {
@@ -25,6 +26,17 @@ const initialState = {
             return {
                 ...state,
                 error: payload,
+                loading: false
+            };
+
+        case UPDATES_LIKES:
+            return {
+                ...state,
+                posts: state.posts.map(post => (
+                    post._id === payload.id ? { 
+                        ...post, likes: payload.likes 
+                    } : post
+                )),
                 loading: false
             };
 

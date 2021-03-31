@@ -3232,4 +3232,9 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {})(PostItem)
 ```
 
+#### 49. Like & Unlike functionality
+
+To do this we simply add some new actions for adding and removing a like, them we created the reducers for these actions in the reducer. Finally we connected these actions to the `components/posts/PostItems.js` component with an onClick.
+
+#### 49. Deleting posts
 
